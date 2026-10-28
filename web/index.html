@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mania Chart Studio — G4T0XX</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="/" aria-label="Mania Chart Studio, início"
+        ><span class="mark" aria-hidden="true">▥</span
+        ><span
+          >MANIA<span class="brand-sub">CHART STUDIO / G4T0XX</span></span
+        ></a
+      ><span class="local">● Local · 4 keys</span>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">DA FAIXA ÀS QUATRO COLUNAS</p>
+          <h1>Seu som.<br />Seu próximo chart.</h1>
+          <p class="lede">
+            Gere um rascunho com IA. Ouça os acertos, ajuste o tempo e dê forma
+            ao seu mapa.
+          </p>
+        </div>
+        <div class="key-art" aria-hidden="true">
+          <div><i></i><i></i><b>Z</b></div>
+          <div><i></i><i></i><b>X</b></div>
+          <div><i></i><i></i><b>,</b></div>
+          <div><i></i><i></i><b>.</b></div>
+        </div>
+      </section>
+      <section class="workspace" aria-label="Estúdio de criação">
+        <aside>
+          <form id="generate" novalidate>
+            <h2>Nova música</h2>
+            <label for="url">Link do YouTube</label
+            ><input
+              id="url"
+              type="url"
+              placeholder="https://youtu.be/..."
+              aria-describedby="url-help form-error"
+              autocomplete="off"
+            />
+            <p class="hint" id="url-help">
+              Vídeo de até 20 minutos. Sem login ou chave de API.
+            </p>
+            <label for="style">Direção do chart</label
+            ><select id="style">
+              <option value="auto">Adaptar aos ataques do áudio</option>
+              <option value="stream">Stream</option>
+              <option value="jumpstream">Jumpstream</option>
+              <option value="handstream">Handstream</option>
+              <option value="chordjack">Chordjack</option>
+              <option value="jack">Jack</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="ln">Long notes</option></select
+            ><button class="primary" id="generate-button" type="submit">
+              Gerar cinco dificuldades <span aria-hidden="true">↗</span>
+            </button>
+            <p id="form-error" class="error" role="alert"></p>
+            <p id="job-status" class="hint" role="status">
+              A primeira geração baixa o modelo de batidas.
+            </p>
+          </form>
+          <div class="library">
+            <h2>Seus projetos</h2>
+            <div id="library-list">
+              <p class="hint">Carregando biblioteca…</p>
+            </div>
+          </div>
+          <p class="footnote">
+            IA estima as batidas; regras distribuem as notas. O resultado é um
+            rascunho para revisão manual, sem garantia de timing, qualidade ou
+            estrelas.
+          </p>
+        </aside>
+        <section class="editor" aria-label="Editor de chart">
+          <div id="empty">
+            <span class="empty-icon" aria-hidden="true">▥</span>
+            <h2>A próxima faixa começa aqui.</h2>
+            <p>
+              Cole um link à esquerda. Depois, compare cada nota com o áudio
+              antes de exportar.
+            </p>
+            <span class="pill">5 dificuldades · 4 colunas · .osz</span>
+          </div>
+          <div id="project" hidden>
+            <div class="project-heading">
+              <div>
+                <p class="eyebrow">RASCUNHO EDITÁVEL</p>
+                <h2 id="track-title"></h2>
+                <p id="track-artist" class="hint"></p>
+              </div>
+              <span class="pill">4K</span>
+            </div>
+            <div
+              id="difficulty-tabs"
+              class="difficulty-tabs"
+              role="group"
+              aria-label="Dificuldade"
+            ></div>
+            <div id="metrics" class="metrics"></div>
+            <p id="tempo-warning" class="notice"></p>
+            <div class="transport">
+              <button id="play" disabled class="primary" type="button">
+                ▶ Ouvir</button
+              ><button
+                id="back"
+                disabled
+                type="button"
+                aria-label="Voltar três segundos"
+              >
+                −3 s</button
+              ><button
+                id="forward"
+                disabled
+                type="button"
+                aria-label="Avançar três segundos"
+              >
+                +3 s</button
+              ><output id="clock">0:00 / 0:00</output
+              ><label class="check"
+                ><input id="hits" type="checkbox" checked /> Hits</label
+              ><label class="check"
+                ><input id="metro" type="checkbox" /> Metrônomo</label
+              >
+            </div>
+            <label for="seek" class="sr-only">Posição da música</label
+            ><input
+              id="seek"
+              type="range"
+              min="0"
+              max="100"
+              value="0"
+              step="0.01"
+            />
+            <div class="canvas-wrap">
+              <canvas
+                id="timeline"
+                width="1000"
+                height="310"
+                tabindex="0"
+                aria-label="Timeline de quatro colunas. Clique para criar ou remover notas. Use os campos abaixo como alternativa."
+              ></canvas>
+            </div>
+            <div class="timeline-help">
+              <span>Tempo → · Clique: inserir/remover · Shift + clique: LN</span
+              ><label for="zoom"
+                >Janela
+                <select id="zoom">
+                  <option value="4">4 s</option>
+                  <option value="8" selected>8 s</option>
+                  <option value="16">16 s</option>
+                </select></label
+              >
+            </div>
+            <div class="tuning">
+              <label for="bpm"
+                >BPM da grade<input
+                  id="bpm"
+                  type="number"
+                  min="20"
+                  max="500"
+                  step="0.001" /></label
+              ><label for="anchor"
+                >Início da grade (ms)<input
+                  id="anchor"
+                  type="number"
+                  step="1" /></label
+              ><label for="offset"
+                >Offset das notas (ms)<input
+                  id="offset"
+                  type="number"
+                  min="-5000"
+                  max="5000"
+                  step="1" /></label
+              ><button id="apply-timing" disabled type="button">
+                Aplicar ajuste
+              </button>
+            </div>
+            <p class="hint">
+              Offset positivo atrasa os acertos. BPM altera a grade e o
+              metrônomo; as notas só mudam com o offset ou a edição.
+            </p>
+            <details>
+              <summary>Editar nota por tempo e coluna</summary>
+              <div class="note-fields">
+                <label for="note-time"
+                  >Tempo (ms)<input
+                    id="note-time"
+                    type="number"
+                    value="1000"
+                    min="0"
+                    step="1" /></label
+                ><label for="note-lane"
+                  >Coluna<select id="note-lane">
+                    <option value="0">1 · Z</option>
+                    <option value="1">2 · X</option>
+                    <option value="2">3 · ,</option>
+                    <option value="3">4 · .</option>
+                  </select></label
+                ><label for="note-length"
+                  >Duração LN (ms)<input
+                    id="note-length"
+                    type="number"
+                    value="0"
+                    min="0"
+                    step="1" /></label
+                ><button id="add-note" disabled type="button">
+                  Inserir nota</button
+                ><button id="remove-note" disabled type="button">
+                  Remover próxima
+                </button>
+              </div>
+            </details>
+            <div class="actions">
+              <button id="undo" type="button" disabled>Desfazer</button
+              ><button id="save" disabled type="button">Salvar projeto</button
+              ><button id="export" disabled class="primary" type="button">
+                Exportar .osz ↓
+              </button>
+            </div>
+            <p id="editor-status" class="hint" role="status"></p>
+            <p class="footnote">
+              Os arquivos gerados são identificados como AI draft. Exportar não
+              confirma sincronização musical e não torna o mapa elegível a
+              ranked.
+            </p>
+          </div>
+        </section>
+      </section>
+    </main>
+    <footer>
+      G4T0XX
+      <span>MANIA CHART STUDIO · ÁUDIO E PROJETOS GUARDADOS NO SEU PC</span>
+    </footer>
+  </body>
+</html>
